@@ -16,7 +16,7 @@ public class MeshSlicer : MonoBehaviour
 
         if (renderer)
         {
-            material = renderer.sharedMaterial;
+            material = renderer.material;
         }
     }
 

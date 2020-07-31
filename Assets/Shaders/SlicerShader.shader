@@ -5,89 +5,99 @@ Shader "Custom/SlicerShader"
     Properties
     {
         _Color ("Color", Color) = (1,1,1,1)
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
+		_MainTex("Albedo (RGB)", 2D) = "white" {}
+		_CapTex ("Cap", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
 		_SlicingPlane("Slicing Plane", Vector) = (0, 0, 0, 0)
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 200
-
-		Pass
+		Stencil
 		{
-			Cull Front
-			
-			Blend SrcAlpha OneMinusSrcAlpha
-			AlphaToMask On
-			ZWrite On
-
-			Stencil 
-			{
-				Ref 1
-				Comp Always
-				Pass Keep
-				Fail Keep
-				ZFail IncrSat
-			}
-
-			CGPROGRAM
-			
-			#pragma vertex vert
-			#pragma fragment frag
-
-			uniform float4 _SlicingPlane;
-
-			struct appdata {
-				float4 vertex : POSITION;
-			};
-			struct v2f {
-				float4 pos : SV_POSITION;
-				float3 fragWorldPos : TEXCOORD0;
-			};
-			v2f vert(appdata v) {
-				v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
-				return o;
-			}
-
-			void Slice(float4 plane, float3 fragPos)
-			{
-				float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
-
-				if (distance > 0)
-				{
-					discard;
-				}
-			}
-
-			half4 frag(v2f i) : SV_Target 
-			{
-				Slice(_SlicingPlane, i.fragWorldPos);
-
-				return half4(1,0,0,.5);
-			}
-			ENDCG
+			Ref 0
+			Comp Always
 		}
 
 		Pass
-		{
-			Cull Front
-
-			Blend SrcAlpha OneMinusSrcAlpha
-			AlphaToMask On
-			ZWrite On
-
+		{			
+			Tags { "Queue" = "Geometry-3" }
 			Stencil
 			{
-				Ref 1
-				Comp Always
-				Pass Keep
+				
+				Pass IncrSat
 				Fail Keep
-				ZFail DecrSat
+				ZFail Keep
 			}
+			Cull Front
+			ColorMask 0
+			/*Blend SrcAlpha OneMinusSrcAlpha
+			AlphaToMask On*/
+			//ZTest Off
+			ZWrite On			
+
+			CGPROGRAM
+			
+			#pragma vertex vert
+			#pragma fragment frag
+
+			uniform float4 _SlicingPlane;
+			uniform sampler2D _CapTex;
+
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+			struct v2f 
+			{
+				float4 pos : SV_POSITION;
+				float2 uv : TEXCOORD0;
+				float3 fragWorldPos : TEXCOORD1;
+			};
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			void Slice(float4 plane, float3 fragPos, float2 uv)
+			{
+				float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
+
+				if (distance > 0)
+				{
+					discard;
+					//return fixed4(0, 0, 0, 0);
+				}				
+			}
+
+			half4 frag(v2f i) : SV_Target
+			{
+				Slice(_SlicingPlane, i.fragWorldPos, i.uv);
+				return half4(1, 1, 1, 1);
+			}
+			ENDCG
+		}	
+
+		Pass
+		{
+			Tags { "Queue" = "Geometry-4" }
+			Stencil
+			{
+				Pass DecrSat
+				Fail Keep
+				ZFail Keep
+			}
+			Cull Back
+			ColorMask 0
+			//Blend SrcAlpha OneMinusSrcAlpha 
+			//AlphaToMask On
+			//ZTest Off
+			ZWrite On
 
 			CGPROGRAM
 
@@ -95,49 +105,65 @@ Shader "Custom/SlicerShader"
 			#pragma fragment frag
 
 			uniform float4 _SlicingPlane;
+			uniform sampler2D _CapTex;
 
-			struct appdata {
+			struct appdata
+			{
 				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
 			};
-			struct v2f {
+			struct v2f
+			{
 				float4 pos : SV_POSITION;
-				float3 fragWorldPos : TEXCOORD0;
+				float2 uv : TEXCOORD0;
+				float3 fragWorldPos : TEXCOORD1;
 			};
-			v2f vert(appdata v) {
+			v2f vert(appdata v)
+			{
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+				o.uv = v.uv;
 				return o;
 			}
 
-			void Slice(float4 plane, float3 fragPos)
+			void Slice(float4 plane, float3 fragPos, float2 uv)
 			{
 				float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
 
 				if (distance > 0)
 				{
 					discard;
+					//return fixed4(0, 0, 0, 0);
 				}
 			}
 
-			half4 frag(v2f i) : SV_Target 
+			half4 frag(v2f i) : SV_Target
 			{
-				Slice(_SlicingPlane, i.fragWorldPos);
-
-				return half4(1,0,0,.5);
+				Slice(_SlicingPlane, i.fragWorldPos, i.uv);
+				return half4(1, 1, 1, 1);
 			}
 			ENDCG
 		}
 
+		Tags{ "Queue" = "Geometry-2" }
+		Cull Off
+		/*
+		*/
+		/*ZTest LEqual
+		ZWrite On*/
+		/*Blend SrcAlpha OneMinusSrcAlpha
+		AlphaToMask On*/
+
         CGPROGRAM
+
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows vertex:vert
+        #pragma surface surf Standard fullforwardshadows vertex:vert alpha:blend
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
 
 		uniform float4 _SlicingPlane;
-
         sampler2D _MainTex;
 
         struct Input
@@ -154,13 +180,6 @@ Shader "Custom/SlicerShader"
         half _Glossiness;
         half _Metallic;
         fixed4 _Color;
-
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-        // #pragma instancing_options assumeuniformscaling
-        UNITY_INSTANCING_BUFFER_START(Props)
-            // put more per-instance properties here
-        UNITY_INSTANCING_BUFFER_END(Props)
 
 		void Slice(float4 plane, float3 fragPos)
 		{
