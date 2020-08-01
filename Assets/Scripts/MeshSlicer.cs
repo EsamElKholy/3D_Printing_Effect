@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class MeshSlicer : MonoBehaviour
 {
     public SlicingPlane slicingPlane;
@@ -23,9 +24,18 @@ public class MeshSlicer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (material)
+        UpdateMaterial();
+    }
+
+    public void UpdateMaterial()
+    {
+        if (slicingPlane)
         {
-            material.SetVector("_SlicingPlane", slicingPlane.GetEquation());
+            if (material)
+            {
+                slicingPlane.UpdateEquation();
+                material.SetVector("_SlicingPlane", slicingPlane.GetEquation());
+            }
         }
     }
 }
