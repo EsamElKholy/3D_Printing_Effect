@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: printedMesh_mat
   m_Shader: {fileID: 4800000, guid: cf10b1aaa91a9c9438fa1099f24de1dd, type: 3}
-  m_ShaderKeywords: USE_RING
+  m_ShaderKeywords: USE_HOLOGRAM USE_RING
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -68,7 +68,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _GlowingRingIntensity: 1
     - _GlowingRingThickness: 0.03
+    - _HologramIntensity: 5
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -78,9 +80,11 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _UseGlowingRing: 1
+    - _UseHologram: 1
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.01960786, g: 0.2897295, b: 0.6313726, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlowingRingColor: {r: 0, g: 0.8117647, b: 1, a: 1}
+    - _HologramColor: {r: 0.66516423, g: 0.1986917, b: 0.8962264, a: 0.078431375}
     - _SlicingPlane: {r: 0, g: 1, b: 0, a: -1000}

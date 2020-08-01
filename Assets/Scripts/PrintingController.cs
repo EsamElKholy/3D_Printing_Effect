@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PrintingController : MonoBehaviour
 {
+    private SlicingPlane slicingPlane;
+
     // Start is called before the first frame update
     void Start()
     {

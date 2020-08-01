@@ -253,7 +253,7 @@ BoxCollider:
   m_GameObject: {fileID: 104562200}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -540,7 +540,7 @@ GameObject:
   - component: {fileID: 681592647}
   - component: {fileID: 681592646}
   m_Layer: 0
-  m_Name: SlicingPlane(Clone)
+  m_Name: Cube Slicing Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -554,7 +554,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 681592644}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.6, z: 0}
+  m_LocalPosition: {x: 0, y: -0.201, z: 0}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 997054887}
@@ -821,7 +821,7 @@ GameObject:
   - component: {fileID: 740569202}
   - component: {fileID: 740569201}
   m_Layer: 0
-  m_Name: SlicingPlane(Clone)
+  m_Name: Sphere Slicing Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -835,7 +835,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 740569199}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.63794756, y: 0.35000002, z: 1.59}
+  m_LocalPosition: {x: -0.63794756, y: -0.239, z: 1.59}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 997054887}
@@ -1293,7 +1293,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: printedMesh_mat (Instance) (Instance)
   m_Shader: {fileID: 4800000, guid: cf10b1aaa91a9c9438fa1099f24de1dd, type: 3}
-  m_ShaderKeywords: USE_RING
+  m_ShaderKeywords: USE_HOLOGRAM USE_RING
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -1327,6 +1327,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HologramTex:
+        m_Texture: {fileID: 2800000, guid: 3daf35a3396f4014fbe7d18fc3a9cd4b, type: 3}
+        m_Scale: {x: 0.5, y: 0.5}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -1352,7 +1356,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _GlowingRingIntensity: 1
     - _GlowingRingThickness: 0.03
+    - _HologramIntensity: 125
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -1362,12 +1368,14 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _UseGlowingRing: 1
+    - _UseHologram: 1
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.01960786, g: 0.2897295, b: 0.6313726, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlowingRingColor: {r: 0, g: 0.8117647, b: 1, a: 1}
-    - _SlicingPlane: {r: 0, g: 1, b: 0, a: -0.6}
+    - _HologramColor: {r: 0.045389827, g: 0.092288196, b: 0.5660378, a: 0.3372549}
+    - _SlicingPlane: {r: 0, g: 1, b: 0, a: 0.201}
 --- !u!21 &1581621777
 Material:
   serializedVersion: 6
@@ -1377,7 +1385,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: printedMesh_mat (Instance)
   m_Shader: {fileID: 4800000, guid: cf10b1aaa91a9c9438fa1099f24de1dd, type: 3}
-  m_ShaderKeywords: USE_RING
+  m_ShaderKeywords: USE_HOLOGRAM USE_RING
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -1411,6 +1419,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HologramTex:
+        m_Texture: {fileID: 2800000, guid: 3daf35a3396f4014fbe7d18fc3a9cd4b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -1436,7 +1448,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _GlowingRingIntensity: 1
     - _GlowingRingThickness: 0.03
+    - _HologramIntensity: 125
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -1446,12 +1460,14 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _UseGlowingRing: 1
+    - _UseHologram: 1
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.01960786, g: 0.2897295, b: 0.6313726, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlowingRingColor: {r: 0, g: 0.8117647, b: 1, a: 1}
-    - _SlicingPlane: {r: 0, g: 1, b: 0, a: -0.35000002}
+    - _HologramColor: {r: 0.045389827, g: 0.092288196, b: 0.5660378, a: 0.3372549}
+    - _SlicingPlane: {r: 0, g: 1, b: 0, a: 0.239}
 --- !u!1 &2005320611
 GameObject:
   m_ObjectHideFlags: 0
