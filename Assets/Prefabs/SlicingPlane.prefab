@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: 6495409677702994786}
   - component: {fileID: 6495409677702994787}
   - component: {fileID: 6495409677702994780}
+  - component: {fileID: 4165929223213473621}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: SlicingPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,5 +104,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9a92a0fd87546547a536db2845e732c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  invert: 0
+  meshToSlice: {fileID: 0}
+--- !u!114 &4165929223213473621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6495409677702994781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c3cb531f4662846b48be5cdbecab4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

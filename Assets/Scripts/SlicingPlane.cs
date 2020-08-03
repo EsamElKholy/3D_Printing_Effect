@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class SlicingPlane : MonoBehaviour
 {
+    public bool invert;
+
     [HideInInspector]
-    public GameObject MeshToSlice;
+    public GameObject meshToSlice;
 
     private Plane slicingPlane;
     private Vector4 equation;
@@ -13,7 +15,14 @@ public class SlicingPlane : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        slicingPlane = new Plane(transform.up, transform.position);
+        Vector3 up = transform.up;
+
+        if (invert)
+        {
+            up = transform.up * -1;
+        }
+
+        slicingPlane = new Plane(up, transform.position);
         equation = new Vector4(slicingPlane.normal.x, slicingPlane.normal.y, slicingPlane.normal.z, slicingPlane.distance);
     }
 
@@ -32,12 +41,50 @@ public class SlicingPlane : MonoBehaviour
     {
         if (transform)
         {
-            slicingPlane.SetNormalAndPosition(transform.up, transform.position);
+            Vector3 up = transform.up;
+
+            if (invert)
+            {
+                up = transform.up * -1;
+            }
+
+            slicingPlane.SetNormalAndPosition(up, transform.position);
 
             equation.x = slicingPlane.normal.x;
             equation.y = slicingPlane.normal.y;
             equation.z = slicingPlane.normal.z;
             equation.w = slicingPlane.distance;
+        }
+    }
+
+    public void ResetPlanePosition(bool toTop)
+    {
+        if (meshToSlice)
+        {
+            transform.position = meshToSlice.transform.position;
+
+            var renderer = meshToSlice.GetComponent<Renderer>();
+
+            float xExtent = renderer.bounds.extents.x;
+            float yExtent = renderer.bounds.extents.y;
+            float zExtent = renderer.bounds.extents.z;
+
+            if (invert)
+            {
+                toTop = !toTop;
+            }
+
+            if (toTop)
+            {
+                transform.Translate(xExtent + (xExtent * 0.1f), yExtent + (yExtent * 0.1f), -zExtent - (zExtent * 0.1f));
+            }
+            else
+            {
+                transform.Translate(-xExtent - (xExtent * 0.1f), -yExtent - (yExtent * 0.1f), zExtent + (zExtent * 0.1f));
+            }
+
+            UpdateEquation();
+            meshToSlice.GetComponent<MeshSlicer>().UpdateMaterial();
         }
     }
 }

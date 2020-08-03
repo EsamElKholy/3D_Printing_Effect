@@ -35,14 +35,14 @@ public class PrintingManager : MonoBehaviour
 
             if (slicingPlane)
             {
-                if (slicingPlane.MeshToSlice == null)
+                if (slicingPlane.meshToSlice == null)
                 {
                     DestroyImmediate(slicingPlane.gameObject);
                     i--;
                     continue;
                 }
 
-                slicingPlane.name = slicingPlane.MeshToSlice.name + " Slicing Plane";
+                slicingPlane.name = slicingPlane.meshToSlice.name + " Slicing Plane";
 
                 slicingPlanes.Add(slicingPlane);
             }
@@ -64,7 +64,7 @@ public class PrintingManager : MonoBehaviour
                 if (slicingPlane)
                 {
                     meshSlicer.slicingPlane = slicingPlane;
-                    slicingPlane.MeshToSlice = meshSlicer.gameObject;
+                    slicingPlane.meshToSlice = meshSlicer.gameObject;
                 }
             }
         }
@@ -91,23 +91,7 @@ public class PrintingManager : MonoBehaviour
         {
             if (meshSlicer.slicingPlane)
             {
-                meshSlicer.slicingPlane.transform.position = meshSlicer.transform.position;
-
-                var renderer = meshSlicer.GetComponent<Renderer>();
-
-                float yExtent = renderer.bounds.extents.y ;
-
-                if (toTop)
-                {
-                    meshSlicer.slicingPlane.transform.Translate(0, (yExtent) + (yExtent * 0.2f), 0);
-                }
-                else
-                {
-                    meshSlicer.slicingPlane.transform.Translate(0, (-yExtent) - (yExtent * 0.2f), 0);
-                }
-
-                meshSlicer.slicingPlane.UpdateEquation();
-                meshSlicer.UpdateMaterial();
+                meshSlicer.slicingPlane.ResetPlanePosition(toTop);
             }
         }
     }
