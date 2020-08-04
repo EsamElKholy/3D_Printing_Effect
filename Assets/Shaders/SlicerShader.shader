@@ -13,30 +13,26 @@ Shader "Custom/SlicerShader"
 		[Toggle(USE_RING)] _UseGlowingRing("Use Glowing Ring", Float) = 0
 		_GlowingRingColor("Glowing Ring Color", Color) = (1, 1, 1, 1)
 		_GlowingRingThickness("Glowing Ring Thickness", Float) = 0
-		_GlowingRingIntensity("Glowing Ring Intensity", Float) = 1
-		[Toggle(USE_HOLOGRAM)] _UseHologram("Use Hologram", Float) = 0
-		_HologramColor("Hologram Color", Color) = (1, 1, 1, 0)
-		_HologramIntensity("Hologram Intensity", Float) = 1
-		_HologramTex("Hologram Texture", 2D) = "white" {}
+		_GlowingRingIntensity("Glowing Ring Intensity", Float) = 1			
 	}
     SubShader
     {
-		Stencil
-		{
-			Ref 0
-			Comp Always
-		}
-
 		Pass
-		{			
+		{	
+			Name "Slicer_Stencil_FirstPass"			
+
 			Tags { "Queue" = "Geometry-3" }
+
 			Stencil
 			{
+				Ref 0
+				Comp Always
 				
 				Pass IncrSat
 				Fail Keep
 				ZFail Keep
 			}
+
 			Cull Front
 			ColorMask 0
 			ZWrite On			
@@ -76,7 +72,6 @@ Shader "Custom/SlicerShader"
 				if (distance > 0)
 				{
 					discard;
-					//return fixed4(0, 0, 0, 0);
 				}				
 			}
 
@@ -90,9 +85,14 @@ Shader "Custom/SlicerShader"
 
 		Pass
 		{
+			Name "Slicer_Stencil_SecondPass"			
+			
 			Tags { "Queue" = "Geometry-4" }
 			Stencil
 			{
+				Ref 0
+				Comp Always
+
 				Pass DecrSat
 				Fail Keep
 				ZFail Keep
@@ -136,7 +136,6 @@ Shader "Custom/SlicerShader"
 				if (distance > 0)
 				{
 					discard;
-					//return fixed4(0, 0, 0, 0);
 				}
 			}
 
@@ -148,7 +147,13 @@ Shader "Custom/SlicerShader"
 			ENDCG
 		}
 
-		Tags{ "Queue" = "Transparent-2" }
+		/*
+		Main pass
+		*/
+
+		Name "Slicer_MainPass"
+
+		Tags{ "Queue" = "Transparent+1" }
 		Cull Off
 		
         CGPROGRAM
@@ -174,7 +179,8 @@ Shader "Custom/SlicerShader"
 			float3 fragWorldPos : TEXCOORD0;
         };
 
-		void vert(inout appdata_full v, out Input o) {
+		void vert(inout appdata_full v, out Input o) 
+		{
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 			o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
 		}
@@ -195,7 +201,6 @@ Shader "Custom/SlicerShader"
 
 		float DrawEmissionRing(float4 plane, float3 fragPos, float4 glowingRingColor, float glowingRingThickness)
 		{
-			//float distance1 = dot(fragPos.xyz, plane.xyz) + plane.w;
 			float distance1 = dot(fragPos.xyz, plane.xyz) + plane.w + glowingRingThickness;
 
 			if (distance1 > 0)
@@ -215,12 +220,9 @@ Shader "Custom/SlicerShader"
 			
 			if (em > 0)
 			{
-				//o.Emission = _GlowingRingColor.rgb * 100;
 				fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 				o.Albedo = _GlowingRingColor.rgb * _GlowingRingIntensity;
-				// Metallic and smoothness come from slider variables
-				/*o.Metallic = _Metallic;
-				o.Smoothness = _Glossiness;*/
+				
 				o.Alpha = c.a;
 			}
 			else 
@@ -228,7 +230,6 @@ Shader "Custom/SlicerShader"
 				o.Emission = (0, 0, 0, 0);
 				fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 				o.Albedo = c.rgb;
-				// Metallic and smoothness come from slider variables
 				o.Metallic = _Metallic;
 				o.Smoothness = _Glossiness;
 				o.Alpha = c.a;
@@ -237,82 +238,13 @@ Shader "Custom/SlicerShader"
 			o.Emission = (0, 0, 0, 0);
 			fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 			o.Albedo = c.rgb;
-			// Metallic and smoothness come from slider variables
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 			o.Alpha = c.a;
 #endif
           
         }
-        ENDCG
-
-		Cull Back
-		CGPROGRAM
-
-			// Physically based Standard lighting model, and enable shadows on all light types
-#pragma surface surf Standard fullforwardshadows vertex:vert alpha:blend
-#pragma shader_feature USE_HOLOGRAM
-
-// Use shader model 3.0 target, to get nicer looking lighting
-#pragma target 3.0
-#include "UnityCG.cginc"
-
-		uniform float4 _SlicingPlane;
-		uniform float4 _HologramColor;
-		uniform float _HologramIntensity;
-		uniform sampler2D _HologramTex;
-
-		sampler2D _MainTex;
-
-		struct Input
-		{
-			float2 uv_MainTex;
-			float2 uv_HologramTex;
-
-			float3 fragWorldPos : TEXCOORD1;
-		};
-
-		void vert(inout appdata_full v, out Input o) {
-			UNITY_INITIALIZE_OUTPUT(Input, o);
-			o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
-		}
-
-		half _Glossiness;
-		half _Metallic;
-		fixed4 _Color;
-
-		float Slice(float4 plane, float3 fragPos)
-		{
-			float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
-
-			if (distance > 0)
-			{
-				return 1;
-			}
-
-			return 0;
-		}
-		
-		void surf(Input IN, inout SurfaceOutputStandard o)
-		{
-#if USE_HOLOGRAM
-			float em = Slice(_SlicingPlane, IN.fragWorldPos);			
-
-			if (em > 0)
-			{
-				fixed4 c = tex2D(_HologramTex, IN.uv_HologramTex) * _HologramColor;
-				o.Albedo = c.rgb * _HologramIntensity;				
-				o.Alpha = c.a;
-			}
-			
-#else
-			o.Emission = (0, 0, 0);
-			o.Albedo = (0, 0, 0);			
-			o.Alpha = 0;
-#endif
-
-		}
-		ENDCG
+        ENDCG		
     }
     FallBack "Diffuse"
 }

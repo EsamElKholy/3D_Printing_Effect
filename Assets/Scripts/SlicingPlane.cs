@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class SlicingPlane : MonoBehaviour
 {
-    public bool invert;
-
     [HideInInspector]
     public GameObject meshToSlice;
 
@@ -16,11 +14,6 @@ public class SlicingPlane : MonoBehaviour
     void Start()
     {
         Vector3 up = transform.up;
-
-        if (invert)
-        {
-            up = transform.up * -1;
-        }
 
         slicingPlane = new Plane(up, transform.position);
         equation = new Vector4(slicingPlane.normal.x, slicingPlane.normal.y, slicingPlane.normal.z, slicingPlane.distance);
@@ -42,12 +35,7 @@ public class SlicingPlane : MonoBehaviour
         if (transform)
         {
             Vector3 up = transform.up;
-
-            if (invert)
-            {
-                up = transform.up * -1;
-            }
-
+            
             slicingPlane.SetNormalAndPosition(up, transform.position);
 
             equation.x = slicingPlane.normal.x;
@@ -68,11 +56,6 @@ public class SlicingPlane : MonoBehaviour
             float xExtent = renderer.bounds.extents.x;
             float yExtent = renderer.bounds.extents.y;
             float zExtent = renderer.bounds.extents.z;
-
-            if (invert)
-            {
-                toTop = !toTop;
-            }
 
             if (toTop)
             {

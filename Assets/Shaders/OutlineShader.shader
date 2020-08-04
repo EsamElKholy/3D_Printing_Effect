@@ -2,77 +2,293 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
-		_SceneTex("Scene Texture",2D) = "black"{} 
+		[Toggle(USE_OUTLINE)] _UseOutline("Use Outline", Float) = 0
+		_OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
+		_OutlineThickness("Outline Thickness", Range(0, 1)) = 0.01
+		_OutlineIntensity("Outline Intensity", Float) = 1
+		_Angle("Switch shader on angle", Range(0.0, 180)) = 89
 	}
     SubShader
     {	
+		/*
+		Outline pass
+		*/
+
 		Pass
-        {
-			Blend SrcAlpha OneMinusSrcAlpha
-            
+		{
+			//Name "Outline_FirstPass"
+
+			Tags{ "Queue" = "Transparent+12" }
+			
+			Stencil
+			{
+				Ref 0
+				Comp Always
+
+				Pass IncrSat
+				Fail IncrSat
+				ZFail IncrSat
+			}
+
+			Cull off
+			ColorMask 0
+			ZWrite off
+			Lighting Off
+
 			CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
 
-            #include "UnityCG.cginc"
+			#pragma vertex vert
+			#pragma fragment frag 
+			#include "UnityCG.cginc"
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
+			uniform float4 _OutlineColor;
+			uniform float _OutlineThickness;
+			uniform float _OutlineIntensity;	
+			uniform float _Angle;
 
-            struct v2f
-            {
-                float4 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+			};					
 
-			uniform sampler2D _SceneTex;
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-			float2 _MainTex_TexelSize;
+			v2f vert(appdata_full v)
+			{
+				//v.vertex.xyz += normalize(v.normal.xyz) * _OutlineThickness;
+				//v.vertex.xyz *= _OutlineThickness;			
 
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-				o.uv.xy = o.vertex.xy / 2 + 0.5;
-                return o;
-            }
+				float3 scaleDir = normalize(v.vertex.xyz - float4(0, 0, 0, 1));
 
-            fixed4 frag (v2f i) : SV_Target
-            {
-				int iterationsCount = 9;
+				if (degrees(acos(dot(scaleDir.xyz, v.normal.xyz))) > _Angle)
+				{
+					v.vertex.xyz += normalize(v.normal.xyz) * _OutlineThickness;
+				}
+				else
+				{
+					v.vertex.xyz += scaleDir * _OutlineThickness;
+				}
+
+				v2f o;
+				UNITY_INITIALIZE_OUTPUT(v2f, o); 
+				o.pos = UnityObjectToClipPos(v.vertex);
+
+				return o;
+			}
+
+			half4 frag(v2f i) : COLOR
+			{
+				return half4(1, 1, 1, 1);
+			}
+			ENDCG
+		}
+
+		Pass
+		{
+			//Name "Outline_SecondPass"
+
+			Tags{ "Queue" = "Transparent+9" }
+
+			Stencil
+			{
+				Ref 0
+				Comp Always
+
+				Pass IncrSat
+				Fail IncrSat
+				ZFail IncrSat
+			}
+
+			Cull off
+			ColorMask 0
+			//ZTest Always
+			ZWrite on
+			Lighting Off
+
+			CGPROGRAM
+
+			#pragma shader_feature USE_OUTLINE
+			#pragma vertex vert
+			#pragma fragment frag 
+			#include "UnityCG.cginc"
+
+			uniform float4 _OutlineColor;
+			uniform float _OutlineThickness;
+			uniform float _OutlineIntensity;			
+
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+			};
+
+			v2f vert(appdata_full v)
+			{
+				v2f o;
+				UNITY_INITIALIZE_OUTPUT(v2f, o); 
+				o.pos = UnityObjectToClipPos(v.vertex);
+
+				return o;
+			}
+
+			half4 frag(v2f i) : COLOR
+			{
+				return half4(1, 1, 1, 1);
+			}
+			ENDCG
+		}
+
+		Pass
+		{
+			//Name "Outline_FinalPass"
+			Tags{ "Queue" = "Transparent+11" }
+
+			Stencil
+			{
+				Ref 1
+				Comp LEqual
+				Fail keep
+			}	
+
+			Cull front
+			//ZTest LEqual
+			ZWrite on
+			/*Blend SrcAlpha OneMinusSrcAlpha
+			AlphaToMask off*/
+			Lighting Off
+
+			CGPROGRAM
+
+			#pragma shader_feature USE_OUTLINE
+			#pragma vertex vert
+			#pragma fragment frag 
+			#include "UnityCG.cginc"
+
+			uniform float4 _OutlineColor;
+			uniform float _OutlineThickness;
+			uniform float _OutlineIntensity;
+			uniform float3 _CenterPivot;
+			uniform float _Angle;
+
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+			};		
+
+			v2f vert(appdata_full v)
+			{
+				//v.vertex.xyz *= _OutlineThickness;
 				
-				float TX_x = _MainTex_TexelSize.x;
-				float TX_y = _MainTex_TexelSize.y;
+				//v.vertex.xyz += normalize(v.normal.xyz) * _OutlineThickness;
+				
+				float3 scaleDir = normalize(v.vertex.xyz - float4(0, 0, 0, 1));
 
-				float colorIntensityInRadius = 0;
-				half4 scene = tex2D(_SceneTex, i.uv.xy);
-
-				if (tex2D(_MainTex, i.uv.xy).r > 0)
+				if (degrees(acos(dot(scaleDir.xyz, v.normal.xyz))) > _Angle)
 				{
-					return tex2D(_SceneTex, float2(i.uv.x, i.uv.y));
+					v.vertex.xyz += normalize(v.normal.xyz) * _OutlineThickness;
+				}
+				else
+				{
+					v.vertex.xyz += scaleDir * _OutlineThickness;
 				}
 
-				for (int k = 0; k < iterationsCount; k++)
-				{
-					for (int j = 0; j < iterationsCount; j++)
-					{
-						colorIntensityInRadius += tex2D(_MainTex, i.uv.xy + float2((k - iterationsCount / 2) * TX_x, (j - iterationsCount / 2) * TX_y)).r;
-					}
-				}
-				//scene = (1 - colorIntensityInRadius) * scene;
-				fixed4 col = fixed4(0, 1, 1, 1);
-				col.rgb *= colorIntensityInRadius;
-				fixed4 col2 = tex2D(_SceneTex, float2(i.uv.x, i.uv.y));
-				col2.rgb *= (1 - colorIntensityInRadius);
+				v2f o;
+				UNITY_INITIALIZE_OUTPUT(v2f, o);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
-                return col + col2;
-            }
-            ENDCG
-        }
+				return o;
+			}
+
+			half4 frag(v2f i) : SV_Target
+			{
+#if USE_OUTLINE
+				half4 col = _OutlineColor;
+				col.rgb *= _OutlineIntensity;
+				//return half4(1, 1, 1, 1);
+				return col;
+#else
+				return half4(1, 1, 1, 1);
+#endif
+			}
+			ENDCG
+		}
+
+		Pass
+		{
+			//Name "Outline_FinalPass"
+			Tags{ "Queue" = "Transparent+17" }			
+
+			Cull back
+			//ZTest LEqual
+			ZWrite on
+			Blend SrcAlpha OneMinusSrcAlpha
+			AlphaToMask off
+			Lighting Off
+
+			CGPROGRAM
+
+			#pragma shader_feature USE_OUTLINE
+			#pragma vertex vert
+			#pragma fragment frag 
+			#include "UnityCG.cginc"
+
+			uniform float4 _OutlineColor;
+			uniform float _OutlineThickness;
+			uniform float _OutlineIntensity;
+
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+			};
+
+			float4 Outline(float4 pos, float3 normal, float width)
+			{
+				float4x4 scaleMat;
+
+				scaleMat[0][0] = 1;
+				scaleMat[0][1] = 0;
+				scaleMat[0][2] = 0;
+				scaleMat[0][3] = normal.x * width;
+
+				scaleMat[1][0] = 0;
+				scaleMat[1][1] = 1;
+				scaleMat[1][2] = 0;
+				scaleMat[1][3] = normal.y * width;
+
+				scaleMat[2][0] = 0;
+				scaleMat[2][1] = 0;
+				scaleMat[2][2] = 1;
+				scaleMat[2][3] = normal.z * width;
+
+				scaleMat[3][0] = 0;
+				scaleMat[3][1] = 0;
+				scaleMat[3][2] = 0;
+				scaleMat[3][3] = 1;
+				pos.xyz *= width;
+
+				return pos;
+			}
+
+			v2f vert(appdata_full v)
+			{
+				//v.vertex.xyz = v.vertex.xyz + v.normal * _OutlineThickness;
+				//v.vertex.xyz *= _OutlineThickness;
+				v2f o;
+				UNITY_INITIALIZE_OUTPUT(v2f, o);
+				o.pos = UnityObjectToClipPos(v.vertex);
+
+				return o;
+			}
+
+			half4 frag(v2f i) : SV_Target
+			{
+#if USE_OUTLINE
+				half4 col = _OutlineColor;
+				col.rgb *= _OutlineIntensity;
+				return half4(0, 1, 1, 1);
+				//return col;
+#else
+				return half4(1, 1, 1, 1);
+#endif
+			}
+			ENDCG
+		}
     }
 }
