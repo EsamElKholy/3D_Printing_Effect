@@ -49,24 +49,28 @@ public class SlicingPlane : MonoBehaviour
     {
         if (meshToSlice)
         {
-            transform.position = meshToSlice.transform.position;
-
             var renderer = meshToSlice.GetComponent<Renderer>();
             var top = KAI.ModelUtils.GetTopCenter(renderer.gameObject);
-            var bottom = KAI.ModelUtils.GetBottomCenter(renderer.gameObject, true);
-            float dist = Vector3.Distance(top, transform.position);
+            var bottom = KAI.ModelUtils.GetBottomCenter(renderer.gameObject);
+            var center = KAI.ModelUtils.GetCenter(renderer.gameObject);
+            transform.position = center;
+            //float dist = Vector3.Distance(top, transform.position);
 
-            float xExtent = renderer.bounds.extents.x;
-            float yExtent = dist;
-            float zExtent = renderer.bounds.extents.z;
+            //float xExtent = renderer.bounds.extents.x;
+            //float yExtent = dist;
+            //float zExtent = renderer.bounds.extents.z;
 
             if (toTop)
             {
-                transform.Translate(xExtent + (xExtent * 0.1f), top.y + 0.1f, -zExtent - (zExtent * 0.1f));
+                top.y += Vector3.Distance(top, bottom) * 0.1f;
+                transform.position = top;
+                //transform.Translate(xExtent + (xExtent * 0.1f), top.y + 0.1f, -zExtent - (zExtent * 0.1f));
             }
             else
             {
-                transform.Translate(-xExtent - (xExtent * 0.1f), bottom.y, zExtent + (zExtent * 0.1f));
+                bottom.y -= Vector3.Distance(top, bottom) * 0.1f;
+                transform.position = bottom;
+                //transform.Translate(-xExtent - (xExtent * 0.1f), bottom.y, zExtent + (zExtent * 0.1f));
             }
 
             UpdateEquation();

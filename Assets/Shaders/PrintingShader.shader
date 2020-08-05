@@ -32,7 +32,6 @@
 
 
 		//UsePass "Custom/SlicerShader/Slicer_Stencil_PrePass"
-		UsePass "Custom/HologramShader/Hologram_Pass"
 
 		UsePass "Custom/OutlineShader/Outline_FirstPass"
 		UsePass "Custom/OutlineShader/Outline_SecondPass_"
@@ -42,6 +41,7 @@
 		UsePass "Custom/OutlineShader/Outline_SecondPass"
 		UsePass "Custom/OutlineShader/Outline_FinalPass"
 
+		UsePass "Custom/HologramShader/Hologram_Pass"
 
 		UsePass "Custom/SlicerShader/Slicer_Stencil_FirstPass"
 		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"

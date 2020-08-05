@@ -41,10 +41,8 @@ public class PrintingController : MonoBehaviour
             isPrinting = false;
             startedPrinting = false;
             counter = 0;
-
-            slicingPlane.meshToSlice.gameObject.layer = LayerMask.NameToLayer(initialLayer);
         }
-    }
+    }   
 
     public void StartPrinting()
     {
@@ -59,8 +57,6 @@ public class PrintingController : MonoBehaviour
         targetPosition = slicingPlane.transform.position;
 
         slicingPlane.ResetPlanePosition(false);
-
-        slicingPlane.meshToSlice.gameObject.layer = LayerMask.NameToLayer("PCC");
     }
 
     public void UpdatePrinter()

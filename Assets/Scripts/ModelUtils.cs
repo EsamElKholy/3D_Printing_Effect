@@ -22,7 +22,7 @@ namespace KAI
         {
             Bounds res;
 
-            obj.transform.position = Vector3.zero;
+            //obj.transform.position = Vector3.zero;
 
             var renderers = obj.GetComponentsInChildren<Renderer>();
             if (withCollider)
