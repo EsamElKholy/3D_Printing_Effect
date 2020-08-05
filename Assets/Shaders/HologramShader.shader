@@ -78,9 +78,9 @@
 
 				if (em > 0)
 				{
-					fixed4 c = tex2D(_HologramTex, i.uv) * _HologramColor;
+					fixed4 c = fixed4(tex2D(_HologramTex, i.uv).rgb * _HologramColor.rgb, 1);
 					c.rgb = c.rgb * _HologramIntensity;
-
+					c.a = _HologramColor.a;
 					return c;
 				}
 				else

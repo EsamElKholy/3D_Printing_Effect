@@ -62,13 +62,13 @@ public class SlicingPlane : MonoBehaviour
 
             if (toTop)
             {
-                top.y += Vector3.Distance(top, bottom) * 0.1f;
+                top.y += Vector3.Distance(top, bottom) * 0.02f;
                 transform.position = top;
                 //transform.Translate(xExtent + (xExtent * 0.1f), top.y + 0.1f, -zExtent - (zExtent * 0.1f));
             }
             else
             {
-                bottom.y -= Vector3.Distance(top, bottom) * 0.1f;
+                bottom.y -= Vector3.Distance(top, bottom) * 0.02f;
                 transform.position = bottom;
                 //transform.Translate(-xExtent - (xExtent * 0.1f), bottom.y, zExtent + (zExtent * 0.1f));
             }

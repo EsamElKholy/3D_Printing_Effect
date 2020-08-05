@@ -13,22 +13,20 @@ public class PrintingController : MonoBehaviour
     private Vector3 initialPosition;
     private float printTime = 10;
     private float counter = 0;
-    private string initialLayer;
 
     // Start is called before the first frame update
     void Start()
     {
         slicingPlane = GetComponent<SlicingPlane>();
-        initialLayer = LayerMask.LayerToName(slicingPlane.meshToSlice.gameObject.layer);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            StartPrinting();
-        }
+        //if (Input.GetKeyUp(KeyCode.Space))
+        //{
+        //    StartPrinting();
+        //}
 
         if (startedPrinting)
         {
@@ -41,11 +39,17 @@ public class PrintingController : MonoBehaviour
             isPrinting = false;
             startedPrinting = false;
             counter = 0;
+            slicingPlane.meshToSlice.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
         }
     }   
 
     public void StartPrinting()
     {
+        if (slicingPlane == null)
+        {
+            slicingPlane = GetComponent<SlicingPlane>();
+        }
+
         counter = 0;
 
         startedPrinting = true;

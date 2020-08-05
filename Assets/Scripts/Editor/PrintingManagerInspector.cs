@@ -24,7 +24,8 @@ public class PrintingManagerInspector : Editor
 
         if (GUILayout.Button("Update"))
         {
-            manager.UpdateMeshes();
+            manager.UpdateAllMeshes();
+            manager.UpdateAllMeshes();
         }
     }
 }
