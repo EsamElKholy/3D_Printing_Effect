@@ -4,27 +4,29 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
 		_Color("Color", Color) = (1,1,1,1)
+		_Intensity("Intensity", Float) = 1
 	}
     SubShader
     {
-		Tags { "RenderType" = "Geometry" "Queue" = "Geometry-1" }
-		Stencil
-		{
-			Ref 1
-			Comp Equal
-		}
+		Tags { "Queue" = "Transparent+8" }
 		Pass
-		{
+		{			
+			Stencil
+			{
+				Ref 1
+				Comp LEqual
+			}
+			Cull off
 			ZTest LEqual
-			ZWrite On
-			Blend SrcAlpha OneMinusSrcAlpha
-			AlphaToMask off
+			ZWrite on
+			//Blend One OneMinusSrcAlpha
+			AlphaToMask on
 			//Tags { "Queue" = "Geometry+3" }
 		/*	ColorMask RGB
 			*/
 
 			
-		CGPROGRAM
+			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -44,6 +46,7 @@
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			uniform float4 _Color;
+			uniform float _Intensity;
 
 			v2f vert(appdata v)
 			{
@@ -57,7 +60,7 @@
 			{
 				// sample the texture
 				fixed4 col = /*tex2D(_MainTex, i.uv) **/ _Color;
-				col.rgb *= 3;
+				col.rgb *= _Intensity;
 				return col;// (0, 0, 1, 1);
 			}
 			ENDCG

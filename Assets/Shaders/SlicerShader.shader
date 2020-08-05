@@ -6,22 +6,23 @@ Shader "Custom/SlicerShader"
     {
         _Color ("Color", Color) = (1,1,1,1)
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
-		_CapTex ("Cap", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
+
 		_SlicingPlane("Slicing Plane", Vector) = (0, 0, 0, 0)
-		[Toggle(USE_RING)] _UseGlowingRing("Use Glowing Ring", Float) = 0
+		_CapTex ("Cap", 2D) = "white" {}
+
+		[KeywordEnum(Off, On)] _UseGlowingRing("Use Glowing Ring", Float) = 0
 		_GlowingRingColor("Glowing Ring Color", Color) = (1, 1, 1, 1)
 		_GlowingRingThickness("Glowing Ring Thickness", Float) = 0
 		_GlowingRingIntensity("Glowing Ring Intensity", Float) = 1			
 	}
     SubShader
-    {
+    {		
+		Tags { "Queue" = "Transparent-20" }
 		Pass
 		{	
-			Name "Slicer_Stencil_FirstPass"			
-
-			Tags { "Queue" = "Geometry-3" }
+			Name "Slicer_Stencil_FirstPass"	
 
 			Stencil
 			{
@@ -32,7 +33,7 @@ Shader "Custom/SlicerShader"
 				Fail Keep
 				ZFail Keep
 			}
-
+			//AlphaToMask on
 			Cull Front
 			ColorMask 0
 			ZWrite On			
@@ -83,11 +84,11 @@ Shader "Custom/SlicerShader"
 			ENDCG
 		}	
 
+		Tags { "Queue" = "Transparent-21" }
 		Pass
 		{
 			Name "Slicer_Stencil_SecondPass"			
 			
-			Tags { "Queue" = "Geometry-4" }
 			Stencil
 			{
 				Ref 0
@@ -100,6 +101,7 @@ Shader "Custom/SlicerShader"
 			Cull Back
 			ColorMask 0
 			ZWrite On
+			//AlphaToMask on
 
 			CGPROGRAM
 
@@ -153,14 +155,15 @@ Shader "Custom/SlicerShader"
 
 		Name "Slicer_MainPass"
 
-		Tags{ "Queue" = "Transparent+1" }
+		Tags{ "Queue" = "Transparent+22" }
 		Cull Off
-		
+		//AlphaToMask on
+
         CGPROGRAM
 
         // Physically based Standard lighting model, and enable shadows on all light types
         #pragma surface surf Standard fullforwardshadows vertex:vert alpha:blend
-		#pragma shader_feature USE_RING
+		#pragma shader_feature _USEGLOWINGRING_ON _USEGLOWINGRING_OFF
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
@@ -215,7 +218,7 @@ Shader "Custom/SlicerShader"
         {
             // Albedo comes from a texture tinted by color
 			Slice(_SlicingPlane, IN.fragWorldPos);
-#if USE_RING
+#if _USEGLOWINGRING_ON
 			float em = DrawEmissionRing(_SlicingPlane, IN.fragWorldPos, _GlowingRingColor, _GlowingRingThickness);
 			
 			if (em > 0)

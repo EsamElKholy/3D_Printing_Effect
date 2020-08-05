@@ -4,7 +4,7 @@
 	{
 		_SlicingPlane("Slicing Plane", Vector) = (0, 0, 0, 0)
 	
-		[Toggle(USE_HOLOGRAM)] _UseHologram("Use Hologram", Float) = 1
+		[KeywordEnum(Off, On)] _UseHologram("Use Hologram", Float) = 1
 		_HologramColor("Hologram Color", Color) = (1, 1, 1, 1)
 		_HologramIntensity("Hologram Intensity", Float) = 1
 		_HologramTex("Hologram Texture", 2D) = "white" {}
@@ -15,23 +15,22 @@
 		Hologram pass
 		*/
 
+		Tags{ "Queue" = "Transparent+100" }
 		Pass
 		{
 			Name "Hologram_Pass"
-
-			Tags{ "Queue" = "Transparent+2" }
 			
 			Cull back
-			ZWrite off
 			Lighting off
 			Blend SrcAlpha OneMinusSrcAlpha
+			AlphaToMask On
 
 			CGPROGRAM
 
 			// Physically based Standard lighting model, and enable shadows on all light types
 			#pragma fragment frag 
 			#pragma vertex vert 
-			#pragma shader_feature USE_HOLOGRAM
+			#pragma shader_feature _USEHOLOGRAM_ON _USEHOLOGRAM_OFF
 
 			#include "UnityCG.cginc"
 
@@ -53,9 +52,9 @@
 				v2f o;
 				UNITY_INITIALIZE_OUTPUT(v2f, o);
 
-				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.texcoord, _HologramTex);
 				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				return o;
 			}
@@ -74,13 +73,14 @@
 
 			half4 frag(v2f i) : SV_Target
 			{
-#if USE_HOLOGRAM
+#if _USEHOLOGRAM_ON
 				float em = Slice(_SlicingPlane, i.fragWorldPos);
 
 				if (em > 0)
 				{
 					fixed4 c = tex2D(_HologramTex, i.uv) * _HologramColor;
 					c.rgb = c.rgb * _HologramIntensity;
+
 					return c;
 				}
 				else

@@ -52,18 +52,21 @@ public class SlicingPlane : MonoBehaviour
             transform.position = meshToSlice.transform.position;
 
             var renderer = meshToSlice.GetComponent<Renderer>();
+            var top = KAI.ModelUtils.GetTopCenter(renderer.gameObject);
+            var bottom = KAI.ModelUtils.GetBottomCenter(renderer.gameObject, true);
+            float dist = Vector3.Distance(top, transform.position);
 
             float xExtent = renderer.bounds.extents.x;
-            float yExtent = renderer.bounds.extents.y;
+            float yExtent = dist;
             float zExtent = renderer.bounds.extents.z;
 
             if (toTop)
             {
-                transform.Translate(xExtent + (xExtent * 0.1f), yExtent + (yExtent * 0.1f), -zExtent - (zExtent * 0.1f));
+                transform.Translate(xExtent + (xExtent * 0.1f), top.y + 0.1f, -zExtent - (zExtent * 0.1f));
             }
             else
             {
-                transform.Translate(-xExtent - (xExtent * 0.1f), -yExtent - (yExtent * 0.1f), zExtent + (zExtent * 0.1f));
+                transform.Translate(-xExtent - (xExtent * 0.1f), bottom.y, zExtent + (zExtent * 0.1f));
             }
 
             UpdateEquation();

@@ -4,44 +4,71 @@
     {
 		_Color("Color", Color) = (1,1,1,1)
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
-		_CapTex("Cap", 2D) = "white" {}
 		_Glossiness("Smoothness", Range(0,1)) = 0.5
 		_Metallic("Metallic", Range(0,1)) = 0.0
+		
 		_SlicingPlane("Slicing Plane", Vector) = (0, 0, 0, 0)
-		[Toggle(USE_RING)] _UseGlowingRing("Use Glowing Ring", Float) = 0
+		_CapTex("Cap", 2D) = "white" {}
+
+		[KeywordEnum(Off, On)] _UseGlowingRing("Use Glowing Ring", Float) = 0
 		_GlowingRingColor("Glowing Ring Color", Color) = (1, 1, 1, 1)
 		_GlowingRingThickness("Glowing Ring Thickness", Float) = 0
 		_GlowingRingIntensity("Glowing Ring Intensity", Float) = 1
-		[Toggle(USE_HOLOGRAM)] _UseHologram("Use Hologram", Float) = 0
+
+		[KeywordEnum(Off, On)] _UseHologram("Use Hologram", Float) = 0
 		_HologramColor("Hologram Color", Color) = (1, 1, 1, 1)
 		_HologramIntensity("Hologram Intensity", Float) = 1
 		_HologramTex("Hologram Texture", 2D) = "white" {}
 
-		[Toggle(USE_OUTLINE)] _UseOutline("Use Outline", Float) = 0
+		[KeywordEnum(Off, On)] _UseOutline("Use Outline", Float) = 0
 		_OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
-		_OutlineThickness("Outline Thickness", Range(1.0, 10.0)) = 1.01
+		_OutlineThickness("Outline Thickness", Range(0, 1)) = 0.01
 		_OutlineIntensity("Outline Intensity", Float) = 1
+		_Angle("Switch shader on angle", Range(0.0, 180)) = 89
     }
 
     SubShader
 	{
-		/*UsePass "Custom/HologramShader/Hologram_Pass"
-		UsePass "Custom/SlicerShader/Slicer_Stencil_FirstPass"
-		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"*/
 
+
+		//UsePass "Custom/SlicerShader/Slicer_Stencil_PrePass"
+		UsePass "Custom/HologramShader/Hologram_Pass"
 
 		UsePass "Custom/OutlineShader/Outline_FirstPass"
+		UsePass "Custom/OutlineShader/Outline_SecondPass_"
+		UsePass "Custom/OutlineShader/Outline_SecondPass"
+		UsePass "Custom/OutlineShader/Outline_SecondPass"
+		UsePass "Custom/OutlineShader/Outline_SecondPass"
 		UsePass "Custom/OutlineShader/Outline_SecondPass"
 		UsePass "Custom/OutlineShader/Outline_FinalPass"
 
-		Tags{ "Queue" = "Transparent+1" }
-		Cull Off
+
+		UsePass "Custom/SlicerShader/Slicer_Stencil_FirstPass"
+		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
+		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
+		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
+
+			//UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
+		/*Stencil
+		{
+			Ref 1
+			WriteMask 1
+			Comp Always
+		}*/
+
+		Tags{ "Queue" = "Transparent+5" }
+		Cull back
+		//ZWrite off
+		/*
+		*/
+		Blend SrcAlpha OneMinusSrcAlpha
+		AlphaToMask On
 
 		CGPROGRAM
 
 		// Physically based Standard lighting model, and enable shadows on all light types
 		#pragma surface surf Standard fullforwardshadows vertex:vert alpha:blend
-		#pragma shader_feature USE_RING
+		#pragma shader_feature _USEGLOWINGRING_ON _USEGLOWINGRING_OFF
 
 		// Use shader model 3.0 target, to get nicer looking lighting
 		#pragma target 3.0
@@ -96,7 +123,7 @@
 		{
 			// Albedo comes from a texture tinted by color
 			Slice(_SlicingPlane, IN.fragWorldPos);
-#if USE_RING
+#if _USEGLOWINGRING_ON
 			float em = DrawEmissionRing(_SlicingPlane, IN.fragWorldPos, _GlowingRingColor, _GlowingRingThickness);
 
 			if (em > 0)
