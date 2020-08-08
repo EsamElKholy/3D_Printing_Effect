@@ -10,3 +10,6 @@ Keyboard Key "E", "Q": Rotate model
 
 
 Keyboard Key "Escape": Cancel placement
+
+
+NOTE: The code is still super messy and needs lots of refactoring
