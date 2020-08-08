@@ -36,7 +36,7 @@ namespace KAI
                 }
 
                 res = tempCol.bounds;
-                //DestroyImmediate(tempCol);
+                DestroyImmediate(tempCol);
             }
             else
             {
@@ -59,7 +59,7 @@ namespace KAI
 
                     b = tempCol.bounds;
 
-                    //DestroyImmediate(tempCol);
+                    DestroyImmediate(tempCol);
                 }
                 else
                 {

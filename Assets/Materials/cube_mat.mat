@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: cube_mat
   m_Shader: {fileID: 4800000, guid: bd8db17f74731b9408ff6ee64b87a03c, type: 3}
-  m_ShaderKeywords: USE_HOLOGRAM USE_OUTLINE _USEGLOWINGRING_OFF _USEHOLOGRAM_ON _USEOUTLINE_ON
+  m_ShaderKeywords: USE_HOLOGRAM USE_OUTLINE _USEGLOWINGRING_ON _USEHOLOGRAM_ON _USEOUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -34,18 +34,18 @@ Material:
     m_Floats:
     - _Angle: 180
     - _Glossiness: 0.5
-    - _GlowingRingIntensity: 1
-    - _GlowingRingThickness: 0
+    - _GlowingRingIntensity: 20
+    - _GlowingRingThickness: 0.05
     - _HologramIntensity: 1
     - _Metallic: 0
     - _OutlineIntensity: 10
     - _OutlineThickness: 0.01
-    - _UseGlowingRing: 0
+    - _UseGlowingRing: 1
     - _UseHologram: 1
     - _UseOutline: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _GlowingRingColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GlowingRingColor: {r: 0, g: 0.83320045, b: 1, a: 1}
     - _HologramColor: {r: 0.576, g: 0.5091107, b: 1, a: 0.34509805}
     - _OutlineColor: {r: 0.5, g: 1, b: 0.9954108, a: 1}
     - _SlicingPlane: {r: 0, g: 1, b: 0, a: -0}

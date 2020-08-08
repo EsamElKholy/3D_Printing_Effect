@@ -111,7 +111,7 @@
 
 			Cull Front
 			ColorMask 0
-			ZWrite on
+			ZWrite off
 			AlphaToMask on
 			//ZTest on
 			CGPROGRAM

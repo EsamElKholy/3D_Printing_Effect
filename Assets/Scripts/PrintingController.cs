@@ -23,11 +23,6 @@ public class PrintingController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyUp(KeyCode.Space))
-        //{
-        //    StartPrinting();
-        //}
-
         if (startedPrinting)
         {
             isPrinting = true;
@@ -40,13 +35,9 @@ public class PrintingController : MonoBehaviour
             startedPrinting = false;
             counter = 0;
             slicingPlane.meshToSlice.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-
-            var lerpAlpha = slicingPlane.meshToSlice.GetComponent<LerpAlpha>();
-
-            if (lerpAlpha)
-            {
-                lerpAlpha.StopAnimation();
-            }
+            slicingPlane.GetComponent<Renderer>().enabled = false;
+            slicingPlane.transform.Translate(0, 1, 0);
+            slicingPlane.UpdateEquation();
         }
     }   
 
@@ -67,7 +58,9 @@ public class PrintingController : MonoBehaviour
         slicingPlane.ResetPlanePosition(true);
         targetPosition = slicingPlane.transform.position;
 
-        slicingPlane.ResetPlanePosition(false);        
+        slicingPlane.ResetPlanePosition(false);
+
+        slicingPlane.GetComponent<Renderer>().enabled = true;
     }
 
     public void UpdatePrinter()

@@ -23,7 +23,7 @@ public class SlicingPlaneResizer : MonoBehaviour
 
     public void Resize()
     {
-        if (slicingPlane)
+        if (slicingPlane && slicingPlane.meshToSlice)
         {
             if (slicedMesh == null)
             {
@@ -34,7 +34,7 @@ public class SlicingPlaneResizer : MonoBehaviour
         if (slicedMesh)
         {
             var center = KAI.ModelUtils.GetCenter(slicedMesh.gameObject);
-           // transform.position = new Vector3(center.x, transform.position.y, center.z);
+
             Bounds b = renderer.bounds;
             var sA = b.size;
             var sB = slicedMesh.bounds.size;

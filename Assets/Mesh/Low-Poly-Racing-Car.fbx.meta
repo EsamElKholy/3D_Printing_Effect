@@ -3,7 +3,42 @@ guid: b9e52c4a5fc0a624db237b8348d25779
 ModelImporter:
   serializedVersion: 25
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Platform
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: car body
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: engine grille
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glass
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: headlight
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rear lights
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wheels
+    second: {fileID: 2100000, guid: 5e473d7bfaaa61742a43449ff88523c6, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

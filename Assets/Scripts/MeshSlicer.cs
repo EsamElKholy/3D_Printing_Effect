@@ -17,7 +17,7 @@ public class MeshSlicer : MonoBehaviour
 
     private new Renderer renderer;
     private Vector4 planeEquation;
-    private Material material;
+    private Material[] materials = new Material[0];
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +29,7 @@ public class MeshSlicer : MonoBehaviour
 
         if (renderer)
         {
-            material = renderer.sharedMaterial;
+            materials = renderer.sharedMaterials;
         }
     }
 
@@ -48,16 +48,36 @@ public class MeshSlicer : MonoBehaviour
     {
         if (slicingPlane)
         {
-            if (material)
+            if (!renderer)
+            {
+                renderer = GetComponent<Renderer>();
+            }
+
+            if (renderer)
+            {
+                if (materials.Length == 0)
+                {
+                    materials = renderer.sharedMaterials;
+                }
+            }
+
+            if (materials.Length > 0)
             {
                 if (activeShader)
                 {
-                    material.shader = activeShader;
+                    for (int i = 0; i < materials.Length; i++)
+                    {
+                        materials[i].shader = activeShader;
+                    }
+                }
+
+                for (int i = 0; i < materials.Length; i++)
+                {
+                    materials[i].SetVector("_SlicingPlane", slicingPlane.GetEquation());
                 }
 
                 slicingPlane.UpdateEquation();
-                material.SetVector("_SlicingPlane", slicingPlane.GetEquation());
-            }
+            }            
         }
     }
 

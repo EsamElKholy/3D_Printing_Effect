@@ -6,6 +6,8 @@ public class SlicingPlane : MonoBehaviour
 {
     [HideInInspector]
     public GameObject meshToSlice;
+    [HideInInspector]
+    public GameObject root;
 
     private Plane slicingPlane;
     private Vector4 equation;
@@ -50,27 +52,18 @@ public class SlicingPlane : MonoBehaviour
         if (meshToSlice)
         {
             var renderer = meshToSlice.GetComponent<Renderer>();
-            var top = KAI.ModelUtils.GetTopCenter(renderer.gameObject);
-            var bottom = KAI.ModelUtils.GetBottomCenter(renderer.gameObject);
-            var center = KAI.ModelUtils.GetCenter(renderer.gameObject);
-            transform.position = center;
-            //float dist = Vector3.Distance(top, transform.position);
-
-            //float xExtent = renderer.bounds.extents.x;
-            //float yExtent = dist;
-            //float zExtent = renderer.bounds.extents.z;
+            var top = KAI.ModelUtils.GetTopCenter(renderer.transform.gameObject);
+            var bottom = KAI.ModelUtils.GetBottomCenter(renderer.transform.gameObject);
 
             if (toTop)
             {
-                top.y += Vector3.Distance(top, bottom) * 0.1f;
+                top.y += Vector3.Distance(top, bottom) * 0.05f;
                 transform.position = top;
-                //transform.Translate(xExtent + (xExtent * 0.1f), top.y + 0.1f, -zExtent - (zExtent * 0.1f));
             }
             else
             {
-                bottom.y -= Vector3.Distance(top, bottom) * 0.1f;
+                bottom.y -= Vector3.Distance(top, bottom) * 0.02f;
                 transform.position = bottom;
-                //transform.Translate(-xExtent - (xExtent * 0.1f), bottom.y, zExtent + (zExtent * 0.1f));
             }
 
             UpdateEquation();

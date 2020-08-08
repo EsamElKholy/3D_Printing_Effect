@@ -7,10 +7,10 @@ public class PrintingManager : MonoBehaviour
     public GameObject slicingPlanePrefab;
     public List<GameObject> meshesPrefabs = new List<GameObject>();
 
-    public List<Renderer> meshes = new List<Renderer>();
+    public List<GameObject> meshes = new List<GameObject>();
     private List<SlicingPlane> slicingPlanes = new List<SlicingPlane>();
 
-    public List<Renderer> tempMeshes = new List<Renderer>();
+    public List<GameObject> tempMeshes = new List<GameObject>();
     private List<SlicingPlane> tempSlicingPlanes = new List<SlicingPlane>();
 
     private int lastMeshesCount = 0;
@@ -21,8 +21,9 @@ public class PrintingManager : MonoBehaviour
     private bool inPlacementMode = false;
     private bool placeObject = false;
     private int currentObjectIndex = 0;
-    private bool reset = false;    
+    private bool reset = false;
 
+    public float rotationSpeed = 50;
     // Start is called before the first frame update
     void Start()
     {     
@@ -41,7 +42,11 @@ public class PrintingManager : MonoBehaviour
             reset = true;
             for (int i = 0; i < tempMeshes.Count; i++)
             {
-                tempMeshes[i].enabled = false;
+                var tempRends = tempMeshes[i].GetComponentsInChildren<Renderer>();
+                foreach (var rend in tempRends)
+                {
+                    rend.enabled = false;
+                }
             }
         }
 
@@ -50,18 +55,19 @@ public class PrintingManager : MonoBehaviour
             if (reset)
             {
                 reset = false;
-                var lerpAlpha = tempMeshes[currentObjectIndex].GetComponent<LerpAlpha>();
-                //lerpAlpha.StopAnimation();
             }
             else if (placeObject)
             {
                 placeObject = false;
-                var controller = PlaceObject();
+                var controllers = PlaceObject();
 
-                if (controller)
+                foreach (var controller in controllers)
                 {
-                    controller.StartPrinting();
-                }
+                    if (controller)
+                    {
+                        controller.StartPrinting();
+                    }
+                }             
             }
         }
 
@@ -121,68 +127,117 @@ public class PrintingManager : MonoBehaviour
             if (tempMeshes.Count > 0)
             {
                 var mesh = tempMeshes[currentObjectIndex];
-                mesh.enabled = true;
+                var mr = mesh.GetComponentsInChildren<Renderer>();
+
+                for (int j = 0; j < mr.Length; j++)
+                {
+                    mr[j].enabled = true;
+                }
 
                 for (int i = 0; i < tempMeshes.Count; i++)
                 {
                     if (i != currentObjectIndex)
                     {
-                        tempMeshes[i].enabled = false;
+                        var meshRenderers = tempMeshes[i].GetComponentsInChildren<Renderer>();
+                        for (int j = 0; j < meshRenderers.Length; j++)
+                        {
+                            meshRenderers[j].enabled = false;
+                        }
                     }
                 }
 
                 if (mesh)
                 {
-                    var slicer = mesh.GetComponent<MeshSlicer>();
-                    
-                    if (slicer)
+                    var slicers = mesh.GetComponentsInChildren<MeshSlicer>();
+                    mesh.transform.position = rayHitPos;
+                    float lowestY = 10000;
+                    foreach (var slicer in slicers)
                     {
-                        //var lerpAlpha = slicer.GetComponent<LerpAlpha>();
-                        //lerpAlpha.StartAnimation();
-                        slicer.ActivateOutlineHologramShader();
-                        mesh.transform.position = rayHitPos;
-                        slicer.slicingPlane.ResetPlanePosition(false);
-                        
-                        var top = KAI.ModelUtils.GetTopCenter(mesh.gameObject);
-                        var bottom = KAI.ModelUtils.GetBottomCenter(mesh.gameObject);
+                        if (slicer)
+                        {
+                            slicer.ActivateOutlineHologramShader();
+                            slicer.slicingPlane.ResetPlanePosition(false);
+                            if (slicer.slicingPlane.transform.position.y <= lowestY)
+                            {
+                                lowestY = slicer.slicingPlane.transform.position.y;
+                            }
+                        }
+                    }
 
-                        var length = Mathf.Abs(mouseRayHit.transform.position.y - bottom.y);
+                    if (Input.GetKey(KeyCode.E))
+                    {
+                        mesh.transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime, Space.World);
+                    }
 
-                        mesh.transform.position = new Vector3(rayHitPos.x, rayHitPos.y + length + 0.01f, rayHitPos.z);
-                        mesh.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                    if (Input.GetKey(KeyCode.Q))
+                    {
+                        mesh.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
+                    }
+
+                    var length = Mathf.Abs(mouseRayHit.transform.position.y - lowestY);
+
+                    mesh.transform.position = new Vector3(rayHitPos.x, rayHitPos.y + length, rayHitPos.z);
+
+                    foreach (var m in mesh.GetComponentsInChildren<Renderer>())
+                    {
+                        m.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                     }
                 }
             }
         }          
     }
 
-    public PrintingController PlaceObject()
+    public List<PrintingController> PlaceObject()
     {
-        PrintingController controller = null;
+        List<PrintingController> controllers = new List<PrintingController>();
 
         if (tempMeshes.Count > 0)
         {
             var mesh = Instantiate<GameObject>(tempMeshes[currentObjectIndex].gameObject);
             mesh.name = tempMeshes[currentObjectIndex].gameObject.name;
-            MeshSlicer slicer = mesh.GetComponent<MeshSlicer>();
-            slicer.ActivatePrintingShader();
 
-            slicer.slicingPlane = null;
+            var slicers = mesh.GetComponentsInChildren<MeshSlicer>();
 
-            var meshRenderer = mesh.GetComponent<Renderer>();
-            meshRenderer.material = new Material(tempMeshes[currentObjectIndex].sharedMaterial);
-            meshes.Add(meshRenderer);
+            foreach (var slicer in slicers)
+            {
+                slicer.ActivatePrintingShader();
 
-            UpdateMeshes();           
+                slicer.slicingPlane = null;
+            }
 
-            tempMeshes[currentObjectIndex].enabled = false;
+            var tempRends = tempMeshes[currentObjectIndex].GetComponentsInChildren<Renderer>();
+            var meshRenderers = mesh.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < tempRends.Length; i++)
+            {
+                var newMat = new Material(tempRends[i].sharedMaterials[0]);
+                for (int j = 0; j < tempRends[i].sharedMaterials.Length; j++)
+                {
+                    meshRenderers[i].materials[j] = newMat;
+                }
+            }
+          
+            meshes.Add(mesh);
 
-            controller = mesh.GetComponent<MeshSlicer>().slicingPlane.GetComponent<PrintingController>();
+            UpdateMeshes();
+
+            for (int i = 0; i < tempRends.Length; i++)
+            {
+                tempRends[i].enabled = false;
+            }
+
+            foreach (var slicer in slicers)
+            {
+                var controller = slicer.slicingPlane.GetComponent<PrintingController>();
+                if (controller)
+                {
+                    controllers.Add(controller);
+                }
+            }
         }
 
         placeObject = false;
 
-        return controller;
+        return controllers;
     }
 
     public void UpdateAllMeshes()
@@ -193,7 +248,7 @@ public class PrintingManager : MonoBehaviour
 
     public void UpdateTempMeshes()
     {
-        tempMeshes = new List<Renderer>();
+        tempMeshes = new List<GameObject>();
 
         GameObject tempMeshesRoot = null;
 
@@ -215,7 +270,7 @@ public class PrintingManager : MonoBehaviour
         {
             var mesh = Instantiate<GameObject>(meshesPrefabs[i], tempMeshesRoot.transform);
             mesh.name = meshesPrefabs[i].name;
-            tempMeshes.Add(mesh.GetComponent<Renderer>());
+            tempMeshes.Add(mesh);
         }
 
         GameObject tempRoot = null;
@@ -239,26 +294,42 @@ public class PrintingManager : MonoBehaviour
 
         foreach (var mesh in tempMeshes)
         {
-            var meshSlicer = mesh.gameObject.GetComponent<MeshSlicer>();
+            var renderers = mesh.GetComponentsInChildren<Renderer>();
+            var meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
 
-            if (meshSlicer == null)
+            if (meshSlicers.Length == 0 || meshSlicers.Length != renderers.Length)
             {
-                meshSlicer = mesh.gameObject.AddComponent<MeshSlicer>();
-            }
-            
-            if (meshSlicer.slicingPlane == null)
-            {
-                var slicingPlane = AddSlicingPlane(true);
-
-                if (slicingPlane)
+                for (int i = 0; i < renderers.Length; i++)
                 {
-                    meshSlicer.slicingPlane = slicingPlane;
-                    slicingPlane.meshToSlice = meshSlicer.gameObject;
-                    slicingPlane.name = mesh.name + "_Plane";
+                    if (renderers[i].GetComponent<MeshSlicer>() == null)
+                    {
+                        renderers[i].gameObject.AddComponent<MeshSlicer>();
+                    }
                 }
             }
 
-            mesh.enabled = false;
+            meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
+
+            foreach (var meshSlicer in meshSlicers)
+            {
+                if (meshSlicer.slicingPlane == null)
+                {
+                    var slicingPlane = AddSlicingPlane(true);
+
+                    if (slicingPlane)
+                    {
+                        meshSlicer.slicingPlane = slicingPlane;
+                        slicingPlane.meshToSlice = meshSlicer.gameObject;
+                        slicingPlane.root = mesh;
+                        slicingPlane.name = mesh.name + "_Plane";
+                    }
+                }
+            }
+
+            foreach (var ren in renderers)
+            {
+                ren.enabled = false;
+            }
         }
     }
 
@@ -324,21 +395,34 @@ public class PrintingManager : MonoBehaviour
 
         foreach (var mesh in meshes)
         {
-            var meshSlicer = mesh.gameObject.GetComponent<MeshSlicer>();
+            var renderers = mesh.GetComponentsInChildren<Renderer>();
+            var meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
 
-            if (meshSlicer == null)
+            if (meshSlicers.Length == 0 || meshSlicers.Length != renderers.Length)
             {
-                meshSlicer = mesh.gameObject.AddComponent<MeshSlicer>();
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    if (renderers[i].GetComponent<MeshSlicer>() == null)
+                    {
+                        renderers[i].gameObject.AddComponent<MeshSlicer>();
+                    }
+                }
             }
 
-            if (meshSlicer.slicingPlane == null)
-            {
-                var slicingPlane = AddSlicingPlane(false);
+            meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
 
-                if (slicingPlane)
+            foreach (var meshSlicer in meshSlicers)
+            {
+                if (meshSlicer.slicingPlane == null)
                 {
-                    meshSlicer.slicingPlane = slicingPlane;
-                    slicingPlane.meshToSlice = meshSlicer.gameObject;
+                    var slicingPlane = AddSlicingPlane(false);
+
+                    if (slicingPlane)
+                    {
+                        meshSlicer.slicingPlane = slicingPlane;
+                        slicingPlane.meshToSlice = meshSlicer.gameObject;
+                        slicingPlane.root = mesh;
+                    }
                 }
             }
         }
@@ -414,16 +498,20 @@ public class PrintingManager : MonoBehaviour
     {
         foreach (var mesh in tempMeshes)
         {
-            var meshSlicer = mesh.GetComponent<MeshSlicer>();
-
-            ResetSlicingPlanePosition(meshSlicer, toTop);
+            var meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
+            foreach (var meshSlicer in meshSlicers)
+            {
+                ResetSlicingPlanePosition(meshSlicer, toTop);
+            }
         }
 
         foreach (var mesh in meshes)
         {
-            var meshSlicer = mesh.GetComponent<MeshSlicer>();
-
-            ResetSlicingPlanePosition(meshSlicer, toTop);
+            var meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
+            foreach (var meshSlicer in meshSlicers)
+            {
+                ResetSlicingPlanePosition(meshSlicer, toTop);
+            }
         }
     }
 
@@ -431,28 +519,36 @@ public class PrintingManager : MonoBehaviour
     {
         foreach (var mesh in tempMeshes)
         {
-            var meshSlicer = mesh.GetComponent<MeshSlicer>();
-            if (meshSlicer)
+            var meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
+
+            foreach (var meshSlicer in meshSlicers)
             {
-                if (meshSlicer.slicingPlane)
+                if (meshSlicer)
                 {
-                    var resizer = meshSlicer.slicingPlane.GetComponent<SlicingPlaneResizer>();
-                    resizer.Resize();
+                    if (meshSlicer.slicingPlane)
+                    {
+                        var resizer = meshSlicer.slicingPlane.GetComponent<SlicingPlaneResizer>();
+                        resizer.Resize();
+                    }
                 }
             }
         }
 
         foreach (var mesh in meshes)
         {
-            var meshSlicer = mesh.GetComponent<MeshSlicer>();
-            if (meshSlicer)
+            var meshSlicers = mesh.GetComponentsInChildren<MeshSlicer>();
+
+            foreach (var meshSlicer in meshSlicers)
             {
-                if (meshSlicer.slicingPlane)
+                if (meshSlicer)
                 {
-                    var resizer = meshSlicer.slicingPlane.GetComponent<SlicingPlaneResizer>();
-                    resizer.Resize();
+                    if (meshSlicer.slicingPlane)
+                    {
+                        var resizer = meshSlicer.slicingPlane.GetComponent<SlicingPlaneResizer>();
+                        resizer.Resize();
+                    }
                 }
-            }
+            }            
         }
     }
 }
