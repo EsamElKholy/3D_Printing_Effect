@@ -161,6 +161,8 @@ public class PrintingManager : MonoBehaviour
                             {
                                 lowestY = slicer.slicingPlane.transform.position.y;
                             }
+                            slicer.slicingPlane.transform.Translate(0, -10, 0);
+                            slicer.slicingPlane.UpdateEquation();
                         }
                     }
 

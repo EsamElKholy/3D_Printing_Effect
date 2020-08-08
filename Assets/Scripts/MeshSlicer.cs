@@ -73,7 +73,10 @@ public class MeshSlicer : MonoBehaviour
 
                 for (int i = 0; i < materials.Length; i++)
                 {
-                    materials[i].SetVector("_SlicingPlane", slicingPlane.GetEquation());
+                    //if (activeShader != outlineHologram)
+                    {
+                        materials[i].SetVector("_SlicingPlane", slicingPlane.GetEquation());
+                    }
                 }
 
                 slicingPlane.UpdateEquation();

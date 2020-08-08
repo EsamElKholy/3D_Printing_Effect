@@ -95,4 +95,4 @@ Material:
     - _GlowingRingColor: {r: 0.018557072, g: 0, b: 1, a: 1}
     - _HologramColor: {r: 0.33668563, g: 0.88199335, b: 0.9150943, a: 0.33333334}
     - _OutlineColor: {r: 0, g: 0.03949642, b: 1, a: 1}
-    - _SlicingPlane: {r: 0, g: 1, b: 0, a: -0}
+    - _SlicingPlane: {r: 0, g: 1, b: 0, a: 1000}
