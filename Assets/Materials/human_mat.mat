@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: human_mat
-  m_Shader: {fileID: 4800000, guid: dd2076ac46ade6a478130164d5864e5f, type: 3}
+  m_Shader: {fileID: 4800000, guid: bd8db17f74731b9408ff6ee64b87a03c, type: 3}
   m_ShaderKeywords: USE_HOLOGRAM USE_RING _USEGLOWINGRING_ON _USEHOLOGRAM_ON _USEOUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

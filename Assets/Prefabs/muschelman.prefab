@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6646295965178064232}
   - component: {fileID: 3972555223562551473}
   - component: {fileID: 3972555223562551475}
+  - component: {fileID: 5837941631322923487}
   m_Layer: 0
   m_Name: muschelman
   m_TagString: Untagged
@@ -27,13 +28,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4900115388083132852}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &1081122966626308497
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -105,3 +106,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slicingPlane: {fileID: 0}
+  outlineHologram: {fileID: 4800000, guid: bd8db17f74731b9408ff6ee64b87a03c, type: 3}
+  printingShader: {fileID: 4800000, guid: dd2076ac46ade6a478130164d5864e5f, type: 3}
+  hologramColor: {r: 0, g: 0, b: 0, a: 0}
+  outlineColor: {r: 0, g: 0, b: 0, a: 0}
+--- !u!114 &5837941631322923487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4900115388083132852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95ffa159901f11f46a345aaccf50faf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

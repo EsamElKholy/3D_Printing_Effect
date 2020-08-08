@@ -10,8 +10,8 @@
 
         Pass
         {
-			ZWrite Off
-			ZTest Always
+			//ZWrite Off
+			//ZTest Always
 			Lighting Off
 
             CGPROGRAM

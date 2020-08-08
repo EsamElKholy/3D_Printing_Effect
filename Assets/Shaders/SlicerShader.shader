@@ -19,24 +19,29 @@ Shader "Custom/SlicerShader"
 	}
     SubShader
     {		
-		Tags { "Queue" = "Transparent-20" }
+		Tags { "Queue" = "Geometry-9" }
+	
 		Pass
 		{	
 			Name "Slicer_Stencil_FirstPass"	
 
 			Stencil
 			{
-				Ref 0
-				Comp Always
-				
-				Pass IncrSat
-				Fail Keep
-				ZFail Keep
+				Ref 64
+				WriteMask 64
+
+				CompBack Always
+				PassBack replace
+
+				CompFront Always
+				PassFront zero
 			}
+			
 			//AlphaToMask on
-			Cull Front
+			Cull back
 			ColorMask 0
-			ZWrite On			
+			ZWrite On
+			//ZTest off
 
 			CGPROGRAM
 			
@@ -79,30 +84,32 @@ Shader "Custom/SlicerShader"
 			half4 frag(v2f i) : SV_Target
 			{
 				Slice(_SlicingPlane, i.fragWorldPos, i.uv);
-				return half4(0, 0, 0, 0);
+				return 1;
 			}
 			ENDCG
 		}	
 
-		Tags { "Queue" = "Transparent-21" }
+		Tags { "Queue" = "Geometry-10" }
 		Pass
 		{
 			Name "Slicer_Stencil_SecondPass"			
-			
 			Stencil
 			{
-				Ref 0
-				Comp Always
+				Ref 64
+				WriteMask 64
 
-				Pass DecrSat
-				Fail Keep
-				ZFail Keep
+				CompBack Always
+				PassBack replace
+
+				CompFront Always
+				PassFront zero				
 			}
-			Cull Back
-			ColorMask 0
-			ZWrite On
-			//AlphaToMask on
 
+			Cull Front
+			ColorMask 0
+			ZWrite on
+			AlphaToMask on
+			//ZTest on
 			CGPROGRAM
 
 			#pragma vertex vert
@@ -144,7 +151,7 @@ Shader "Custom/SlicerShader"
 			half4 frag(v2f i) : SV_Target
 			{
 				Slice(_SlicingPlane, i.fragWorldPos, i.uv);
-				return half4(0, 0, 0, 0);
+				return half4(1, 1, 1, 1);
 			}
 			ENDCG
 		}
@@ -156,7 +163,7 @@ Shader "Custom/SlicerShader"
 		Name "Slicer_MainPass"
 
 		Tags{ "Queue" = "Transparent+22" }
-		Cull Off
+		//Cull Off
 		//AlphaToMask on
 
         CGPROGRAM

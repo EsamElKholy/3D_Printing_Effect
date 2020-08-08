@@ -40,6 +40,13 @@ public class PrintingController : MonoBehaviour
             startedPrinting = false;
             counter = 0;
             slicingPlane.meshToSlice.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+
+            var lerpAlpha = slicingPlane.meshToSlice.GetComponent<LerpAlpha>();
+
+            if (lerpAlpha)
+            {
+                lerpAlpha.StopAnimation();
+            }
         }
     }   
 
@@ -60,7 +67,7 @@ public class PrintingController : MonoBehaviour
         slicingPlane.ResetPlanePosition(true);
         targetPosition = slicingPlane.transform.position;
 
-        slicingPlane.ResetPlanePosition(false);
+        slicingPlane.ResetPlanePosition(false);        
     }
 
     public void UpdatePrinter()

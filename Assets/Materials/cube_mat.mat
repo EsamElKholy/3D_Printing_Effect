@@ -8,8 +8,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: cube_mat
-  m_Shader: {fileID: 4800000, guid: dd2076ac46ade6a478130164d5864e5f, type: 3}
-  m_ShaderKeywords: USE_HOLOGRAM USE_OUTLINE _USEGLOWINGRING_ON _USEHOLOGRAM_ON _USEOUTLINE_ON
+  m_Shader: {fileID: 4800000, guid: bd8db17f74731b9408ff6ee64b87a03c, type: 3}
+  m_ShaderKeywords: USE_HOLOGRAM USE_OUTLINE _USEGLOWINGRING_OFF _USEHOLOGRAM_ON _USEOUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -19,27 +19,7 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BumpMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _CapTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailAlbedoMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailMask:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DetailNormalMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -51,48 +31,21 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _OcclusionMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _ParallaxMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Angle: 180
-    - _BumpScale: 1
-    - _Cutoff: 0.5
-    - _DetailNormalMapScale: 1
-    - _DstBlend: 0
-    - _GlossMapScale: 1
     - _Glossiness: 0.5
-    - _GlossyReflections: 1
-    - _GlowingRingIntensity: 15
-    - _GlowingRingThickness: 0.01
-    - _HologramIntensity: 2
+    - _GlowingRingIntensity: 1
+    - _GlowingRingThickness: 0
+    - _HologramIntensity: 1
     - _Metallic: 0
-    - _Mode: 0
-    - _OcclusionStrength: 1
-    - _OutlineIntensity: 26.25
+    - _OutlineIntensity: 10
     - _OutlineThickness: 0.01
-    - _Parallax: 0.02
-    - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 1
-    - _SrcBlend: 1
-    - _UVSec: 0
-    - _UseGlowingRing: 1
+    - _UseGlowingRing: 0
     - _UseHologram: 1
     - _UseOutline: 1
-    - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GlowingRingColor: {r: 0.16838735, g: 0.8113208, b: 0.46708354, a: 1}
-    - _HologramColor: {r: 0.9571457, g: 0, b: 1, a: 0.34117648}
-    - _OutlineColor: {r: 1, g: 0.12539689, b: 0, a: 1}
+    - _GlowingRingColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HologramColor: {r: 0.576, g: 0.5091107, b: 1, a: 0.34509805}
+    - _OutlineColor: {r: 0.5, g: 1, b: 0.9954108, a: 1}
     - _SlicingPlane: {r: 0, g: 1, b: 0, a: -0}

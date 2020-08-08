@@ -8,19 +8,24 @@
 	}
     SubShader
     {
-		Tags { "Queue" = "Transparent+8" }
+		Tags { "Queue" = "Transparent+12" }
 		Pass
 		{			
 			Stencil
 			{
-				Ref 1
-				Comp LEqual
+				Ref 64
+				ReadMask 64
+				Comp LEqual	
+				//pass keep
 			}
-			Cull off
-			ZTest LEqual
-			ZWrite on
-			//Blend One OneMinusSrcAlpha
+
+			Cull back
+			//ZTest off
+			ZWrite On
+			Blend SrcAlpha OneMinusSrcAlpha
 			AlphaToMask on
+			//Blend One OneMinusSrcAlpha
+			//AlphaToMask on
 			//Tags { "Queue" = "Geometry+3" }
 		/*	ColorMask RGB
 			*/
@@ -64,6 +69,6 @@
 				return col;// (0, 0, 1, 1);
 			}
 			ENDCG
-		}
+		}			
     }
 }

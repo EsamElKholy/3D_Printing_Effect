@@ -7,10 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: printedMesh_mat
+  m_Name: cube_mat 1
   m_Shader: {fileID: 4800000, guid: dd2076ac46ade6a478130164d5864e5f, type: 3}
-  m_ShaderKeywords: USE_HOLOGRAM USE_OUTLINE USE_RING _USEGLOWINGRING_OFF _USEHOLOGRAM_ON
-    _USEOUTLINE_ON
+  m_ShaderKeywords: USE_HOLOGRAM USE_OUTLINE _USEGLOWINGRING_ON _USEHOLOGRAM_ON _USEOUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -70,31 +69,30 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EmissionLM: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GlowingRingIntensity: 1
-    - _GlowingRingThickness: 0.03
-    - _HologramIntensity: 5
+    - _GlowingRingIntensity: 15
+    - _GlowingRingThickness: 0.01
+    - _HologramIntensity: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OutlineIntensity: 15
-    - _OutlineThickness: 0.019
+    - _OutlineIntensity: 3.25
+    - _OutlineThickness: 0.02
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _UseGlowingRing: 0
+    - _UseGlowingRing: 1
     - _UseHologram: 1
     - _UseOutline: 1
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.01960786, g: 0.2897295, b: 0.6313726, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GlowingRingColor: {r: 0, g: 0.8117647, b: 1, a: 1}
-    - _HologramColor: {r: 0.19999997, g: 0.40389872, b: 0.8980392, a: 0.078431375}
-    - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
-    - _SlicingPlane: {r: 0, g: 1, b: 0, a: -2.38}
+    - _GlowingRingColor: {r: 0.16838735, g: 0.8113208, b: 0.46708354, a: 1}
+    - _HologramColor: {r: 0.9584907, g: 0.03773582, b: 1, a: 0.29803923}
+    - _OutlineColor: {r: 1, g: 0, b: 0.91147995, a: 1}
+    - _SlicingPlane: {r: 0, g: 1, b: 0, a: 0.06}

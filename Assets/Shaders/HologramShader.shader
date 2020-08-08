@@ -2,7 +2,12 @@
 {
 	Properties
 	{
-		_SlicingPlane("Slicing Plane", Vector) = (0, 0, 0, 0)
+		_Color("Color", Color) = (1,1,1,1)
+		_MainTex("Albedo (RGB)", 2D) = "white" {}
+		_Glossiness("Smoothness", Range(0,1)) = 0.5
+		_Metallic("Metallic", Range(0,1)) = 0.0
+
+		_SlicingPlane("Slicing Plane", Vector) = (0, 1, 0, 10000)
 	
 		[KeywordEnum(Off, On)] _UseHologram("Use Hologram", Float) = 1
 		_HologramColor("Hologram Color", Color) = (1, 1, 1, 1)
@@ -15,15 +20,18 @@
 		Hologram pass
 		*/
 
-		Tags{ "Queue" = "Transparent+100" }
+		Tags{ "Queue" = "Transparent+30" }
 		Pass
 		{
 			Name "Hologram_Pass"
 			
 			Cull back
-			Lighting off
+			//ztest always
+
 			Blend SrcAlpha OneMinusSrcAlpha
 			AlphaToMask On
+			zwrite on
+			Lighting off
 
 			CGPROGRAM
 
@@ -78,14 +86,14 @@
 
 				if (em > 0)
 				{
-					fixed4 c = fixed4(tex2D(_HologramTex, i.uv).rgb * _HologramColor.rgb, 1);
+					fixed4 c = tex2D(_HologramTex, i.uv) * _HologramColor;
 					c.rgb = c.rgb * _HologramIntensity;
-					c.a = _HologramColor.a;
+					//c.a = _HologramColor.a;
 					return c;
 				}
 				else
-				{
-					return half4(0, 0, 0, 0);
+				{					
+					return 0;
 				}			
 
 #else
@@ -94,6 +102,74 @@
 			}
 			ENDCG
 		}
+
+		Tags{ "Queue" = "Transparent+30" }
+		Cull back
+
+		Blend SrcAlpha OneMinusSrcAlpha
+		AlphaToMask On
+
+		CGPROGRAM
+
+		// Physically based Standard lighting model, and enable shadows on all light types
+		#pragma surface surf Standard fullforwardshadows vertex:vert alpha:blend
+		#pragma shader_feature _USEHOLOGRAM_ON _USEHOLOGRAM_OFF
+
+		// Use shader model 3.0 target, to get nicer looking lighting
+		#pragma target 3.0
+
+		uniform float4 _SlicingPlane;
+
+		sampler2D _MainTex;
+
+		struct Input
+		{
+			float2 uv_MainTex;
+
+			float3 fragWorldPos : TEXCOORD0;
+		};
+
+		void vert(inout appdata_full v, out Input o)
+		{
+			UNITY_INITIALIZE_OUTPUT(Input, o);
+			o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+		}
+
+		half _Glossiness;
+		half _Metallic;
+		fixed4 _Color;
+
+		void Slice(float4 plane, float3 fragPos)
+		{
+			float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
+
+			if (distance > 0)
+			{
+				discard;
+			}
+		}
+
+		void surf(Input IN, inout SurfaceOutputStandard o)
+		{
+#if _USEHOLOGRAM_ON
+			Slice(_SlicingPlane, IN.fragWorldPos);
+			
+			fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+			o.Albedo = c.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness;
+			o.Alpha = c.a;
+			
+
+#else
+			fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+			o.Albedo = c.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness;
+			o.Alpha = c.a;
+#endif	
+		}
+		ENDCG
 	}
 	FallBack "Diffuse"
 }

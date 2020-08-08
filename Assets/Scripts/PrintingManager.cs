@@ -21,7 +21,7 @@ public class PrintingManager : MonoBehaviour
     private bool inPlacementMode = false;
     private bool placeObject = false;
     private int currentObjectIndex = 0;
-    private bool reset = false;
+    private bool reset = false;    
 
     // Start is called before the first frame update
     void Start()
@@ -50,7 +50,8 @@ public class PrintingManager : MonoBehaviour
             if (reset)
             {
                 reset = false;
-                
+                var lerpAlpha = tempMeshes[currentObjectIndex].GetComponent<LerpAlpha>();
+                //lerpAlpha.StopAnimation();
             }
             else if (placeObject)
             {
@@ -133,12 +134,15 @@ public class PrintingManager : MonoBehaviour
                 if (mesh)
                 {
                     var slicer = mesh.GetComponent<MeshSlicer>();
-
+                    
                     if (slicer)
                     {
+                        //var lerpAlpha = slicer.GetComponent<LerpAlpha>();
+                        //lerpAlpha.StartAnimation();
+                        slicer.ActivateOutlineHologramShader();
                         mesh.transform.position = rayHitPos;
                         slicer.slicingPlane.ResetPlanePosition(false);
-                       
+                        
                         var top = KAI.ModelUtils.GetTopCenter(mesh.gameObject);
                         var bottom = KAI.ModelUtils.GetBottomCenter(mesh.gameObject);
 
@@ -161,6 +165,7 @@ public class PrintingManager : MonoBehaviour
             var mesh = Instantiate<GameObject>(tempMeshes[currentObjectIndex].gameObject);
             mesh.name = tempMeshes[currentObjectIndex].gameObject.name;
             MeshSlicer slicer = mesh.GetComponent<MeshSlicer>();
+            slicer.ActivatePrintingShader();
 
             slicer.slicingPlane = null;
 
@@ -419,6 +424,35 @@ public class PrintingManager : MonoBehaviour
             var meshSlicer = mesh.GetComponent<MeshSlicer>();
 
             ResetSlicingPlanePosition(meshSlicer, toTop);
+        }
+    }
+
+    public void ResetAllSlicingPlanesSize()
+    {
+        foreach (var mesh in tempMeshes)
+        {
+            var meshSlicer = mesh.GetComponent<MeshSlicer>();
+            if (meshSlicer)
+            {
+                if (meshSlicer.slicingPlane)
+                {
+                    var resizer = meshSlicer.slicingPlane.GetComponent<SlicingPlaneResizer>();
+                    resizer.Resize();
+                }
+            }
+        }
+
+        foreach (var mesh in meshes)
+        {
+            var meshSlicer = mesh.GetComponent<MeshSlicer>();
+            if (meshSlicer)
+            {
+                if (meshSlicer.slicingPlane)
+                {
+                    var resizer = meshSlicer.slicingPlane.GetComponent<SlicingPlaneResizer>();
+                    resizer.Resize();
+                }
+            }
         }
     }
 }

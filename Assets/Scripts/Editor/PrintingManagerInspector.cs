@@ -12,6 +12,11 @@ public class PrintingManagerInspector : Editor
 
         PrintingManager manager = target as PrintingManager;
 
+        if (GUILayout.Button("Reset slicer size"))
+        {
+            manager.ResetAllSlicingPlanes(true);
+        }
+
         if (GUILayout.Button("Reset slicer to top"))
         {
             manager.ResetAllSlicingPlanes(true);

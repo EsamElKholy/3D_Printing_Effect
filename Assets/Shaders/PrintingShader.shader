@@ -19,48 +19,233 @@
 		_HologramColor("Hologram Color", Color) = (1, 1, 1, 1)
 		_HologramIntensity("Hologram Intensity", Float) = 1
 		_HologramTex("Hologram Texture", 2D) = "white" {}
-
-		[KeywordEnum(Off, On)] _UseOutline("Use Outline", Float) = 0
-		_OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
-		_OutlineThickness("Outline Thickness", Range(0, 1)) = 0.01
-		_OutlineIntensity("Outline Intensity", Float) = 1
-		_Angle("Switch shader on angle", Range(0.0, 180)) = 89
     }
 
     SubShader
-	{
+	{	
+		Tags { "Queue" = "Transparent+9" }
 
-
-		//UsePass "Custom/SlicerShader/Slicer_Stencil_PrePass"
-
-		UsePass "Custom/OutlineShader/Outline_FirstPass"
-		UsePass "Custom/OutlineShader/Outline_SecondPass_"
-		UsePass "Custom/OutlineShader/Outline_SecondPass"
-		UsePass "Custom/OutlineShader/Outline_SecondPass"
-		UsePass "Custom/OutlineShader/Outline_SecondPass"
-		UsePass "Custom/OutlineShader/Outline_SecondPass"
-		UsePass "Custom/OutlineShader/Outline_FinalPass"
-
-		UsePass "Custom/HologramShader/Hologram_Pass"
-
-		UsePass "Custom/SlicerShader/Slicer_Stencil_FirstPass"
-		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
-		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
-		UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
-
-			//UsePass "Custom/SlicerShader/Slicer_Stencil_SecondPass"
-		/*Stencil
+		Pass
 		{
-			Ref 1
-			WriteMask 1
-			Comp Always
-		}*/
+			Name "Slicer_Stencil_FirstPass"
 
-		Tags{ "Queue" = "Transparent+5" }
+			Stencil
+			{
+				Ref 64
+				WriteMask 64
+
+				CompBack Always
+				PassBack replace
+
+				CompFront Always
+				PassFront zero
+			}
+
+			//AlphaToMask on
+			Cull back
+			ColorMask 0
+			ZWrite On
+			//ZTest off
+
+			CGPROGRAM
+
+			#pragma vertex vert
+			#pragma fragment frag
+
+			uniform float4 _SlicingPlane;
+			uniform sampler2D _CapTex;
+
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+				float2 uv : TEXCOORD0;
+				float3 fragWorldPos : TEXCOORD1;
+			};
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			void Slice(float4 plane, float3 fragPos, float2 uv)
+			{
+				float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
+
+				if (distance > 0)
+				{
+					discard;
+				}
+			}
+
+			half4 frag(v2f i) : SV_Target
+			{
+				Slice(_SlicingPlane, i.fragWorldPos, i.uv);
+				return 1;
+			}
+			ENDCG
+		}
+
+		Tags { "Queue" = "Transparent+10" }
+		Pass
+		{
+			Name "Slicer_Stencil_SecondPass"
+			Stencil
+			{
+				Ref 64
+				WriteMask 64
+
+				CompBack Always
+				PassBack replace
+
+				CompFront Always
+				PassFront zero
+			}
+
+			Cull Front
+			ColorMask 0
+			ZWrite on
+			AlphaToMask on
+			//ZTest on
+			CGPROGRAM
+
+			#pragma vertex vert
+			#pragma fragment frag
+
+			uniform float4 _SlicingPlane;
+			uniform sampler2D _CapTex;
+
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+				float2 uv : TEXCOORD0;
+				float3 fragWorldPos : TEXCOORD1;
+			};
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			void Slice(float4 plane, float3 fragPos, float2 uv)
+			{
+				float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
+
+				if (distance > 0)
+				{
+					discard;
+				}
+			}
+
+			half4 frag(v2f i) : SV_Target
+			{
+				Slice(_SlicingPlane, i.fragWorldPos, i.uv);
+				return half4(1, 1, 1, 1);
+			}
+			ENDCG
+		}
+
+		Tags{ "Queue" = "Transparent+30" }
+		Pass
+		{
+			Name "Hologram_Pass"
+
+			Cull back
+			//ztest always
+
+			Blend SrcAlpha OneMinusSrcAlpha
+			AlphaToMask On
+			zwrite on
+			Lighting off
+
+			CGPROGRAM
+
+			// Physically based Standard lighting model, and enable shadows on all light types
+			#pragma fragment frag 
+			#pragma vertex vert 
+			#pragma shader_feature _USEHOLOGRAM_ON _USEHOLOGRAM_OFF
+
+			#include "UnityCG.cginc"
+
+			uniform float4 _SlicingPlane;
+			uniform float4 _HologramColor;
+			uniform float _HologramIntensity;
+			uniform sampler2D _HologramTex;
+			float4 _HologramTex_ST;
+
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+				float2 uv : TEXCOORD0;
+				float3 fragWorldPos : TEXCOORD1;
+			};
+
+			v2f vert(appdata_full v)
+			{
+				v2f o;
+				UNITY_INITIALIZE_OUTPUT(v2f, o);
+
+				o.uv = TRANSFORM_TEX(v.texcoord, _HologramTex);
+				o.fragWorldPos = mul(UNITY_MATRIX_M, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
+
+				return o;
+			}
+
+			float Slice(float4 plane, float3 fragPos)
+			{
+				float distance = dot(fragPos.xyz, plane.xyz) + plane.w;
+
+				if (distance > 0)
+				{
+					return 1;
+				}
+
+				return 0;
+			}
+
+			half4 frag(v2f i) : SV_Target
+			{
+#if _USEHOLOGRAM_ON
+				float em = Slice(_SlicingPlane, i.fragWorldPos);
+
+				if (em > 0)
+				{
+					fixed4 c = tex2D(_HologramTex, i.uv) * _HologramColor;
+					c.rgb = c.rgb * _HologramIntensity;
+					//c.a = _HologramColor.a;
+					return c;
+				}
+				else
+				{
+					return 0;
+				}
+
+#else
+				return half4(0, 0, 0, 0);
+#endif
+			}
+			ENDCG
+		}
+
+		Tags{ "Queue" = "Transparent+11" }
 		Cull back
-		//ZWrite off
-		/*
-		*/
+		
 		Blend SrcAlpha OneMinusSrcAlpha
 		AlphaToMask On
 
