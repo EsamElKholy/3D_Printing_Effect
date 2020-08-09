@@ -15,4 +15,4 @@ Keyboard Key "Escape": Cancel placement
 NOTE: The code is still super messy and needs lots of refactoring
 
 
-[![Preview](3D_Printing_Effect.jpg)](https://youtu.be/yr7MDtvkF3w)
+[![Preview](3D_Printing_Effect.jpg)](//youtu.be/yr7MDtvkF3w)
